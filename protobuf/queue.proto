@@ -1,0 +1,28 @@
+syntax = "proto3";
+
+option go_package = "github.com/garupanojisan/mredis/protobuf/pb";
+
+service Queue {
+    // enqueue value
+    rpc Enqueue(EnqueueRequest) returns (EnqueueResponse) {};
+
+    // dequeue value
+    rpc Dequeue(DequeueRequest) returns (DequeueResponse) {};
+}
+
+message EnqueueRequest {
+    string key = 1;
+    bytes value = 2;
+}
+
+message EnqueueResponse {
+
+}
+
+message DequeueRequest {
+    string key = 1;
+}
+
+message DequeueResponse {
+    bytes value = 1;
+}

@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+option go_package = "github.com/garupanojisan/mredis/protobuf/pb";
+
+service Common {
+    // return keys
+    rpc Keys(KeysRequest) returns (KeysResponse) {};
+}
+
+message KeysRequest {
+    string pattern = 1;
+}
+
+message KeysResponse {
+    repeated string keys = 1;
+}

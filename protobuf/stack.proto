@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+option go_package = "github.com/garupanojisan/mredis/protobuf/pb";
+
+service Stack {
+    // Push value
+    rpc Push(PushRequest) returns (PushResponse) {};
+
+    // pop value
+    rpc Pop(PopRequest) returns (PopResponse) {};
+}
+
+message PushRequest {
+    string key = 1;
+    bytes value = 2;
+}
+
+message PushResponse {
+
+}
+
+message PopRequest {
+    string key = 1;
+    bytes value = 2;
+}
+
+message PopResponse {
+    bytes value = 1;
+}
