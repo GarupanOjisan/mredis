@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 
 	"google.golang.org/grpc"
 
@@ -91,5 +92,35 @@ func main() {
 	keys := r.GetKeys()
 	for i := 0; i < len(keys); i++ {
 		fmt.Println(keys[i])
+	}
+
+	// sortedset
+	sortedset := pb.NewSortedSetClient(conn)
+	rankMap := make(map[string]int64)
+	for i := 0; i < 10; i++ {
+		score := rand.Int63n(100)
+		member := fmt.Sprintf("player-%d", i)
+		rankMap[member] = score
+		_, err := sortedset.ZAdd(ctx, &pb.ZAddRequest{
+			Key:    "ranking1",
+			Score:  score,
+			Member: member,
+		})
+		fmt.Printf("registered: player-%d, score = %d\n", i, score)
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
+
+	for i := 0; i < 10; i++ {
+		member := fmt.Sprintf("player-%d", i)
+		sresp, err := sortedset.ZRank(ctx, &pb.ZRankRequest{
+			Key:    "ranking1",
+			Member: member,
+		})
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Printf("%s => rank = %d, score = %d\n", fmt.Sprintf("player-%d", i), sresp.GetRank(), rankMap[member])
 	}
 }

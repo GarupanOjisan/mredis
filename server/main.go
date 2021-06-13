@@ -11,6 +11,7 @@ import (
 	"github.com/garupanojisan/mredis/kvs"
 	"github.com/garupanojisan/mredis/protobuf/pb"
 	"github.com/garupanojisan/mredis/queue"
+	"github.com/garupanojisan/mredis/sortedset"
 	"github.com/garupanojisan/mredis/stack"
 )
 
@@ -45,6 +46,12 @@ func main() {
 		log.Fatal(err)
 	}
 	pb.RegisterCommonServer(srv, common)
+
+	sortedset, err := sortedset.NewSortedSetServer()
+	if err != nil {
+		log.Fatal(err)
+	}
+	pb.RegisterSortedSetServer(srv, sortedset)
 
 	fmt.Println("start listening on :8080")
 	if err := srv.Serve(lis); err != nil {

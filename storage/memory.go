@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"regexp"
+
+	"github.com/garupanojisan/mredis/storage/sortedset"
 )
 
 type Memory struct {
@@ -112,4 +114,34 @@ func (m *Memory) Keys(ctx context.Context, pattern string) ([]string, error) {
 		}
 	}
 	return keys, nil
+}
+
+func (m *Memory) ZAdd(ctx context.Context, key string, score int64, member string) error {
+	if v, ok := m.values[key]; ok {
+		if s, ok := v.(*sortedset.SortedSet); ok {
+			if err := s.Add(ctx, score, member); err != nil {
+				return err
+			}
+			return nil
+		}
+		return fmt.Errorf("unknown value type: key = %s, member = %s, score = %d", key, member, score)
+	}
+
+	s := sortedset.NewSortedSet()
+	if err := s.Add(ctx, score, member); err != nil {
+		return err
+	}
+	m.values[key] = s
+
+	return nil
+}
+
+func (m *Memory) ZRank(ctx context.Context, key, member string) (int64, error) {
+	if v, ok := m.values[key]; ok {
+		if s, ok := v.(*sortedset.SortedSet); ok {
+			return s.RankAsc(ctx, member)
+		}
+		return 0, fmt.Errorf("unknown value type: key = %s", key)
+	}
+	return 0, fmt.Errorf("%w: key = %v", ErrMissingKey, key)
 }
